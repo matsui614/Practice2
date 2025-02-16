@@ -11,7 +11,7 @@ public class Controller : MonoBehaviour
     public float moveSpeed = 3f; // 移動速度
     public float jumpForce = 5f; // ジャンプ力
     private bool isGrounded; // 地面にいるか判定
-
+    
     void Awake()
     {
         TryGetComponent(out animator);
@@ -23,7 +23,18 @@ public class Controller : MonoBehaviour
     {
         var horizontal = Input.GetAxis("Horizontal");
         var vertical = Input.GetAxis("Vertical");
-        var velocity = new Vector3(horizontal, 0, vertical).normalized;
+       
+        // カメラの向きを基準に移動方向を変換
+        Vector3 cameraForward = Camera.main.transform.forward;
+        Vector3 cameraRight = Camera.main.transform.right;
+
+        // Y軸の影響を無視（水平移動のみにする）
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+       
+        Vector3 velocity = (cameraForward * vertical + cameraRight * horizontal).normalized;
         var speed = Input.GetKey(KeyCode.LeftShift) ? 2 : 1;
         var rotationSpeed = 600 * Time.deltaTime;
 
